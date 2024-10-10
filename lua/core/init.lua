@@ -29,6 +29,9 @@ _G.lsp_fts = {
   'css',
   'vim',
   'sh',
+  'go',
+  'php',
+  'vue'
 }
 _G.kind_icons = {
   Text = ' 󰉿 ',

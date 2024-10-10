@@ -17,6 +17,10 @@ function config.treesitter()
       'vim',
       'json',
       'vimdoc',
+      'go',
+      'vue',
+      'rust',
+      'php'
     },
     highlight = {
       enable = true,
@@ -63,5 +67,18 @@ function config.flash()
     modes = { char = { enabled = false } },
   })
 end
-
+function config.nvim_tree()
+  require('nvim-tree').setup({
+    renderer = {
+      icons = {
+        show = {
+          file = false,
+          folder = false,
+          folder_arrow = false,
+          git = false,
+        },
+      },
+    },
+  })
+end
 return config

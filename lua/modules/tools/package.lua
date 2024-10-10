@@ -27,3 +27,11 @@ packadd({
   lazy = true,
   config = conf.flash,
 })
+
+packadd({
+  'nvim-tree/nvim-tree.lua',
+  lazy = true,
+  cmd = 'NvimTreeToggle',
+  config = conf.nvim_tree,
+})
+

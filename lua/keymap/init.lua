@@ -3,6 +3,11 @@ local map = require('core.keymap')
 local cmd = map.cmd
 
 map.n({
+  -- todoo
+  ['<leader>w'] = cmd('w'),
+  ['<leader>qq'] = cmd('q'),
+  ['<leader>q'] = cmd('qa'),
+  ['<leader>t'] = cmd('NvimTreeToggle'),
   -- fzflua
   ['<leader>ff'] = cmd('FzfLua files'),
   ['<leader>fw'] = cmd('FzfLua live_grep'),

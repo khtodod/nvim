@@ -7,7 +7,7 @@ local infos = {
 }
 
 local float_opt = {
-  width = 0.8,
+  width = 0.99,
   height = 0.8,
   title = ' Terminal ',
   relative = 'editor',
