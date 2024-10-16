@@ -1,5 +1,5 @@
 if not vim.fn.has("nvim") then
-	error("This configuration is for Neovim only")
+    error("This configuration is for Neovim only")
 end
 
 local vim = vim
@@ -41,7 +41,7 @@ vim.call("plug#begin")
 Plug("karb94/neoscroll.nvim")
 Plug("https://github.com/junegunn/vim-easy-align.git")
 Plug("fatih/vim-go", { ["tag"] = "*" })
-Plug("neoclide/coc.nvim", { ["branch"] = "release" })
+-- Plug("neoclide/coc.nvim", { ["branch"] = "release" })
 Plug("nsf/gocode", { ["rtp"] = "vim" })
 Plug("tpope/vim-fireplace", { ["for"] = "clojure" })
 Plug("gantoreno/nvim-gabriel")
@@ -55,6 +55,7 @@ Plug("akinsho/toggleterm.nvim", { ["tag"] = "*" })
 Plug("stevearc/conform.nvim")
 Plug("nvim-treesitter/nvim-treesitter", { ["do"] = ":TSUpdate" })
 Plug("nvim-lualine/lualine.nvim")
+Plug("numToStr/Comment.nvim")
 
 vim.call("plug#end")
 
@@ -64,9 +65,9 @@ vim.cmd.colorscheme("gabriel")
 
 -- Lualine setup
 require("lualine").setup({
-	options = {
-		icons_enabled = false,
-	},
+    options = {
+        icons_enabled = false,
+    },
 })
 
 -- Mason
@@ -74,14 +75,17 @@ local lspconfig = require("lspconfig")
 
 require("mason").setup({})
 require("mason-lspconfig").setup({
-	ensure_installed = { "lua_ls", "rust_analyzer" },
+    ensure_installed = { "lua_ls", "rust_analyzer", "intelephense" },
 })
 
 require("mason-lspconfig").setup_handlers({
-	function(server)
-		lspconfig[server].setup({})
-	end,
+    function(server)
+        lspconfig[server].setup({})
+    end,
 })
+
+-- Comment
+require('Comment').setup()
 
 -- Neoscroll setup
 require("neoscroll").setup({ easing_function = "quadratic" })
@@ -98,20 +102,20 @@ require("autoclose").setup()
 
 -- Terminal setup
 require("toggleterm").setup({
-	size = 20, -- Size of the terminal
-	open_mapping = [[<c-\>]], -- Default keymap to open/close the terminal
-	hide_numbers = true, -- Hide line numbers in the terminal buffer
-	shade_filetypes = {},
-	shade_terminals = true,
-	shading_factor = 2, -- Darken the terminal background
-	start_in_insert = true, -- Start in insert mode
-	persist_size = true, -- Persist the terminal size
-	direction = "float", -- Options: 'vertical', 'horizontal', 'tab', 'float'
-	close_on_exit = true, -- Close the terminal when the process exits
-	shell = vim.o.shell, -- Use the default shell
-	float_opts = {
-		border = "curved", -- Border style: 'single', 'double', 'shadow', 'curved'
-	},
+    size = 20,                -- Size of the terminal
+    open_mapping = [[<c-\>]], -- Default keymap to open/close the terminal
+    hide_numbers = true,      -- Hide line numbers in the terminal buffer
+    shade_filetypes = {},
+    shade_terminals = true,
+    shading_factor = 2,     -- Darken the terminal background
+    start_in_insert = true, -- Start in insert mode
+    persist_size = true,    -- Persist the terminal size
+    direction = "float",    -- Options: 'vertical', 'horizontal', 'tab', 'float'
+    close_on_exit = true,   -- Close the terminal when the process exits
+    shell = vim.o.shell,    -- Use the default shell
+    float_opts = {
+        border = "curved",  -- Border style: 'single', 'double', 'shadow', 'curved'
+    },
 })
 
 -- Toggle a terminal with Ctrl-\
@@ -119,7 +123,7 @@ vim.keymap.set("n", "<C-\\>", ":ToggleTerm<CR>", { noremap = true, silent = true
 
 -- Open a terminal in a floating window with <Leader>tf
 vim.keymap.set("n", "<Leader>t", function()
-	require("toggleterm").toggle(1) -- First terminal instance
+    require("toggleterm").toggle(1) -- First terminal instance
 end, { noremap = true, silent = true })
 
 -- Open a vertical split terminal with <Leader>tv
@@ -169,63 +173,63 @@ vim.keymap.set("n", "H", "^", { noremap = true, silent = true })
 
 -- Conform setup
 require("conform").setup({
-	format_on_save = function(bufnr)
-		if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
-			return
-		end
-		return { timeout_ms = 500, lsp_format = "fallback" }
-	end,
-	formatters_by_ft = {
-		lua = { "stylua" },
-		-- Conform will run multiple formatters sequentially
-		python = { "isort", "black" },
-		-- You can customize some of the format options for the filetype (:help conform.format)
-		rust = { "rustfmt", lsp_format = "fallback" },
-		-- Conform will run the first available formatter
-		javascript = { "prettierd", "prettier", stop_after_first = true },
-		go = { "gofmt" },
-		php = { "phpcbf" },
-	},
+    format_on_save = function(bufnr)
+        if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+            return
+        end
+        return { timeout_ms = 500, lsp_format = "fallback" }
+    end,
+    formatters_by_ft = {
+        lua = { "stylua" },
+        -- Conform will run multiple formatters sequentially
+        python = { "isort", "black" },
+        -- You can customize some of the format options for the filetype (:help conform.format)
+        rust = { "rustfmt", lsp_format = "fallback" },
+        -- Conform will run the first available formatter
+        javascript = { "prettierd", "prettier", stop_after_first = true },
+        go = { "gofmt" },
+        php = { "phpcbf" },
+    },
 })
 
 vim.api.nvim_create_user_command("FormatDisable", function(args)
-	if args.bang then
-		-- FormatDisable! will disable formatting just for this buffer
-		vim.b.disable_autoformat = true
-	else
-		vim.g.disable_autoformat = true
-	end
+    if args.bang then
+        -- FormatDisable! will disable formatting just for this buffer
+        vim.b.disable_autoformat = true
+    else
+        vim.g.disable_autoformat = true
+    end
 end, {
-	desc = "Disable autoformat-on-save",
-	bang = true,
+    desc = "Disable autoformat-on-save",
+    bang = true,
 })
 vim.api.nvim_create_user_command("FormatEnable", function()
-	vim.b.disable_autoformat = false
-	vim.g.disable_autoformat = false
+    vim.b.disable_autoformat = false
+    vim.g.disable_autoformat = false
 end, {
-	desc = "Re-enable autoformat-on-save",
+    desc = "Re-enable autoformat-on-save",
 })
 
 -- Treesitter
 require("nvim-treesitter.configs").setup({
-	ensure_installed = {
-		"c",
-		"lua",
-		"vim",
-		"vimdoc",
-		"query",
-		"markdown",
-		"markdown_inline",
-		"vue",
-		"php",
-		"go",
-		"rust",
-		"javascript",
-	},
-	sync_install = false,
-	ignore_install = {},
-	highlight = {
-		enable = true,
-		additional_vim_regex_highlighting = false,
-	},
+    ensure_installed = {
+        "c",
+        "lua",
+        "vim",
+        "vimdoc",
+        "query",
+        "markdown",
+        "markdown_inline",
+        "vue",
+        "php",
+        "go",
+        "rust",
+        "javascript",
+    },
+    sync_install = false,
+    ignore_install = {},
+    highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = false,
+    },
 })
