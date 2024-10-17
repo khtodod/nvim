@@ -41,7 +41,7 @@ vim.call("plug#begin")
 Plug("karb94/neoscroll.nvim")
 Plug("https://github.com/junegunn/vim-easy-align.git")
 Plug("fatih/vim-go", { ["tag"] = "*" })
--- Plug("neoclide/coc.nvim", { ["branch"] = "release" })
+Plug("neoclide/coc.nvim", { ["branch"] = "release" })
 Plug("nsf/gocode", { ["rtp"] = "vim" })
 Plug("tpope/vim-fireplace", { ["for"] = "clojure" })
 Plug("gantoreno/nvim-gabriel")
@@ -144,7 +144,37 @@ require('gitsigns').setup {
 require("neoscroll").setup({ easing_function = "quadratic" })
 
 -- Telescope setup
+local telescope = require('telescope')
 local builtin = require("telescope.builtin")
+
+telescope.setup({
+    defaults = {
+        -- Ignore patterns for files and directories
+        file_ignore_patterns = {
+            "node_modules",        -- Ignore NPM dependencies
+            ".git",                -- Ignore Git folders
+            "vendor",              -- Laravel vendor folder
+            ".cache",              -- Nuxt/Next.js cache
+            "dist",                -- Build artifacts
+            ".nuxt",               -- Nuxt.js build files
+            ".next",               -- Next.js build files
+            "package%-lock%.json", -- Ignore package-lock.json
+            "yarn%.lock",          -- Ignore yarn.lock
+            "storage"
+        },
+    },
+    pickers = {
+        find_files = {
+            hidden = true, -- Show hidden files (if needed)
+        },
+        live_grep = {
+            additional_args = function()
+                return { "--hidden" } -- Include hidden files in search
+            end,
+        },
+    },
+})
+
 vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
 vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Telescope live grep" })
 vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
