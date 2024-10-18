@@ -33,6 +33,7 @@ gcc // code comment out
 <Leader>fg // search for text inside files (like grep).
 <Leader>fb // List open buffers.
 <Leader>fh // search through help tags.
+<Leader>fr // show recent files
 <C>\ // toggle terminal
 <Leader>sv // split window vertically
 <Leader>sh // split window horizontally
