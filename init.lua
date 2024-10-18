@@ -187,10 +187,12 @@ require("autoclose").setup()
 -- Terminal setup
 require("toggleterm").setup({
     size = 20,                -- Size of the terminal
-    open_mapping = [[<c-\>]], -- Default keymap to open/close the terminal
+    open_mapping = [[<c-t>]], -- Default keymap to open/close the terminal
     hide_numbers = true,      -- Hide line numbers in the terminal buffer
     shade_filetypes = {},
     shade_terminals = true,
+    insert_mappings = true,
+    terminal_mappings = true,
     shading_factor = 2,     -- Darken the terminal background
     start_in_insert = true, -- Start in insert mode
     persist_size = true,    -- Persist the terminal size
@@ -206,7 +208,7 @@ require("toggleterm").setup({
 vim.keymap.set("n", "<C-\\>", ":ToggleTerm<CR>", { noremap = true, silent = true })
 
 -- Open a terminal in a floating window with <Leader>tf
-vim.keymap.set("n", "<Leader>t", function()
+vim.keymap.set("n", "<Leader>ta", function()
     require("toggleterm").toggle(1) -- First terminal instance
 end, { noremap = true, silent = true })
 
