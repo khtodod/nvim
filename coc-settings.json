@@ -1,0 +1,22 @@
+{
+    "suggest.noselect": false,
+    "explorer.icon.enableNerdfont": true,
+    "explorer.file.reveal.auto": true,
+    "languageserver": {
+        "phpactor": {
+            "command": "phpactor",
+            "args": [
+                "language-server"
+            ],
+            "trace.server": "verbose",
+            "filetypes": [
+                "php"
+            ]
+        }
+    },
+    "suggest.enablePreselect": true,
+    "keymap": {
+        "tab": "coc#pum#visible() ? coc#pum#next(1) : coc#expandableOrJumpable() ? \"<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump', ''])<CR>\" : \"\\<Tab>\"",
+        "s-tab": "coc#pum#visible() ? coc#pum#prev(1) : \"<C-h>\""
+    }
+}

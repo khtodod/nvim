@@ -76,7 +76,18 @@ local lspconfig = require("lspconfig")
 
 require("mason").setup({})
 require("mason-lspconfig").setup({
-    ensure_installed = { "lua_ls", "rust_analyzer", "intelephense" },
+    ensure_installed = { "lua_ls", "rust_analyzer", "intelephense", "intelephense",
+        "intelephense",
+        "rust_analyzer",
+        "css_variables",
+        "sqlls",
+        "eslint",
+        "volar",
+        "lemminx",
+        "java_language_server",
+        "gopls",
+        "tailwindcss", "html", "jsonls"
+    },
 })
 
 require("mason-lspconfig").setup_handlers({
@@ -275,6 +286,7 @@ require("conform").setup({
         javascript = { "prettierd", "prettier", stop_after_first = true },
         go = { "gofmt" },
         php = { "phpcbf" },
+        json = { "fixjson" }
     },
 })
 
