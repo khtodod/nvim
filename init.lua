@@ -1,12 +1,12 @@
+-- Ensure Neovim is running
 if not vim.fn.has("nvim") then
-    error("This configuration is for Neovim only")
+	error("This configuration is for Neovim only")
 end
 
+-- Set <leader> key and general options
 local vim = vim
-local Plug = vim.fn["plug#"]
-
--- General Neovim Settings
 vim.g.mapleader = " "
+
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.expandtab = true
@@ -22,35 +22,30 @@ vim.opt.incsearch = true
 vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
-vim.opt.isfname:append("@-@")
 vim.opt.updatetime = 50
 vim.opt.colorcolumn = "80"
--- vim.opt.winbar = "%=%m %f"
-
--- Unbind arrow keys in normal, insert, and visual modes
-vim.keymap.set("", "<Up>", "<NOP>", { noremap = true, silent = true })
-vim.keymap.set("", "<Down>", "<NOP>", { noremap = true, silent = true })
-vim.keymap.set("", "<Left>", "<NOP>", { noremap = true, silent = true })
-vim.keymap.set("", "<Right>", "<NOP>", { noremap = true, silent = true })
-
--- Enable mouse support in all modes
 vim.opt.mouse = "a"
 
+vim.cmd([[set isfname+=@-@]])
+-- Unbind arrow keys in all modes
+for _, key in ipairs({ "<Up>", "<Down>", "<Left>", "<Right>" }) do
+	vim.keymap.set("", key, "<NOP>", { noremap = true, silent = true })
+end
+
+-- Plugin Manager (vim-plug) setup
+local Plug = vim.fn["plug#"]
 vim.call("plug#begin")
 
+-- Plugins
 Plug("karb94/neoscroll.nvim")
-Plug("https://github.com/junegunn/vim-easy-align.git")
-Plug("fatih/vim-go", { ["tag"] = "*" })
-Plug("neoclide/coc.nvim", { ["branch"] = "release" })
-Plug("nsf/gocode", { ["rtp"] = "vim" })
-Plug("tpope/vim-fireplace", { ["for"] = "clojure" })
+Plug("neoclide/coc.nvim", { branch = "release" })
 Plug("nvim-lua/plenary.nvim")
-Plug("nvim-telescope/telescope.nvim", { ["tag"] = "0.1.x" })
+Plug("nvim-telescope/telescope.nvim", { tag = "0.1.x" })
 Plug("williamboman/mason.nvim")
 Plug("williamboman/mason-lspconfig.nvim")
 Plug("neovim/nvim-lspconfig")
 Plug("m4xshen/autoclose.nvim")
-Plug("akinsho/toggleterm.nvim", { ["tag"] = "*" })
+Plug("akinsho/toggleterm.nvim", { tag = "*" })
 Plug("stevearc/conform.nvim")
 Plug("nvim-treesitter/nvim-treesitter", { ["do"] = ":TSUpdate" })
 Plug("numToStr/Comment.nvim")
@@ -62,290 +57,170 @@ Plug("xiyaowong/transparent.nvim")
 
 vim.call("plug#end")
 
--- colorscheme
+-- Colorscheme & Transparency
 vim.o.background = "dark"
 vim.cmd.colorscheme("black")
-
--- Transparent
 require("transparent").setup()
-
 vim.api.nvim_create_autocmd("VimEnter", {
-    callback = function()
-        vim.cmd("TransparentEnable")
-    end,
+	callback = function()
+		vim.cmd("TransparentEnable")
+	end,
 })
 
-
-
--- Mason
+-- Mason & LSP Configuration
 local lspconfig = require("lspconfig")
-
-require("mason").setup({})
+require("mason").setup()
 require("mason-lspconfig").setup({
-    ensure_installed = {
-        "lua_ls",
-        "rust_analyzer",
-        "intelephense",
-        "intelephense",
-        "intelephense",
-        "rust_analyzer",
-        "css_variables",
-        "sqlls",
-        "eslint",
-        "volar",
-        "lemminx",
-        "gopls",
-        "tailwindcss",
-        "html",
-        "jsonls",
-    },
+	ensure_installed = {
+		"lua_ls",
+		"rust_analyzer",
+		"intelephense",
+		"css_variables",
+		"sqlls",
+		"eslint",
+		"volar",
+		"lemminx",
+		"gopls",
+		"tailwindcss",
+		"html",
+		"jsonls",
+	},
 })
-
 require("mason-lspconfig").setup_handlers({
-    function(server)
-        lspconfig[server].setup({})
-    end,
+	function(server)
+		lspconfig[server].setup({})
+	end,
 })
 
--- Mini line
-require("mini.statusline").setup({
-    use_icons = false,
+-- Treesitter Configuration
+require("nvim-treesitter.configs").setup({
+	ensure_installed = {
+		"c",
+		"lua",
+		"vim",
+		"vimdoc",
+		"query",
+		"markdown",
+		"markdown_inline",
+		"vue",
+		"php",
+		"go",
+		"rust",
+		"javascript",
+	},
+	highlight = { enable = true, additional_vim_regex_highlighting = false },
 })
 
--- highlight
-require("highlite").setup({ generator = { plugins = { vim = false }, syntax = false } })
-
--- Comment
-require("Comment").setup()
-
--- Git
-require("gitsigns").setup({
-    signs = {
-        add = { text = "┃" },
-        change = { text = "┃" },
-        delete = { text = "_" },
-        topdelete = { text = "‾" },
-        changedelete = { text = "~" },
-        untracked = { text = "┆" },
-    },
-    signs_staged = {
-        add = { text = "┃" },
-        change = { text = "┃" },
-        delete = { text = "_" },
-        topdelete = { text = "‾" },
-        changedelete = { text = "~" },
-        untracked = { text = "┆" },
-    },
-    signs_staged_enable = true,
-    signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
-    numhl = false,     -- Toggle with `:Gitsigns toggle_numhl`
-    linehl = false,    -- Toggle with `:Gitsigns toggle_linehl`
-    word_diff = false, -- Toggle with `:Gitsigns toggle_word_diff`
-    watch_gitdir = {
-        follow_files = true,
-    },
-    auto_attach = true,
-    attach_to_untracked = false,
-    current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
-    current_line_blame_opts = {
-        virt_text = true,
-        virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
-        delay = 1000,
-        ignore_whitespace = false,
-        virt_text_priority = 100,
-        use_focus = true,
-    },
-    current_line_blame_formatter = "<author>, <author_time:%R> - <summary>",
-    sign_priority = 6,
-    update_debounce = 100,
-    status_formatter = nil,  -- Use default
-    max_file_length = 40000, -- Disable if file is longer than this (in lines)
-    preview_config = {
-        -- Options passed to nvim_open_win
-        border = "single",
-        style = "minimal",
-        relative = "cursor",
-        row = 0,
-        col = 1,
-    },
+-- Conform (Formatting)
+require("conform").setup({
+	format_on_save = function(bufnr)
+		if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+			return
+		end
+		return { timeout_ms = 500, lsp_format = "fallback" }
+	end,
+	formatters_by_ft = {
+		lua = { "stylua" },
+		python = { "isort", "black" },
+		rust = { "rustfmt", lsp_format = "fallback" },
+		javascript = { "prettierd", "prettier", stop_after_first = true },
+		go = { "gofmt" },
+		php = { "phpcbf" },
+		json = { "fixjson" },
+	},
 })
+vim.api.nvim_create_user_command("FormatDisable", function(args)
+	vim.b.disable_autoformat = args.bang or false
+	vim.g.disable_autoformat = not args.bang
+end, { desc = "Disable autoformat-on-save", bang = true })
 
--- Neoscroll setup
+vim.api.nvim_create_user_command("FormatEnable", function()
+	vim.b.disable_autoformat, vim.g.disable_autoformat = false, false
+end, { desc = "Enable autoformat-on-save" })
+
+-- Neoscroll Setup
 require("neoscroll").setup({ easing_function = "quadratic" })
 
--- Telescope setup
-local telescope = require("telescope")
-local builtin = require("telescope.builtin")
-
-telescope.setup({
-    defaults = {
-        -- Ignore patterns for files and directories
-        file_ignore_patterns = {
-            "node_modules",        -- Ignore NPM dependencies
-            ".git",                -- Ignore Git folders
-            "vendor",              -- Laravel vendor folder
-            ".cache",              -- Nuxt/Next.js cache
-            "dist",                -- Build artifacts
-            ".nuxt",               -- Nuxt.js build files
-            ".next",               -- Next.js build files
-            "package%-lock%.json", -- Ignore package-lock.json
-            "yarn%.lock",          -- Ignore yarn.lock
-        },
-    },
-    pickers = {
-        find_files = {
-            hidden = true, -- Show hidden files (if needed)
-        },
-        live_grep = {
-            additional_args = function()
-                return { "--hidden" } -- Include hidden files in search
-            end,
-        },
-    },
+-- Gitsigns Setup
+require("gitsigns").setup({
+	signs = {
+		add = { text = "┃" },
+		change = { text = "┃" },
+		delete = { text = "_" },
+		topdelete = { text = "‾" },
+		changedelete = { text = "~" },
+		untracked = { text = "┆" },
+	},
+	current_line_blame = true,
+	current_line_blame_opts = {
+		virt_text = true,
+		virt_text_pos = "eol",
+		delay = 1000,
+	},
+	watch_gitdir = { follow_files = true },
 })
 
+-- Comment Plugin
+require("Comment").setup()
+
+-- Mini Statusline
+require("mini.statusline").setup({ use_icons = false })
+
+-- Telescope Configuration
+local status_ok, telescope = pcall(require, "telescope")
+if not status_ok then
+	vim.notify("Telescope not found!", vim.log.levels.ERROR)
+	return
+end
+
+local builtin_status_ok, builtin = pcall(require, "telescope.builtin")
+if not builtin_status_ok then
+	vim.notify("Telescope built-in functions not available", vim.log.levels.ERROR)
+	return
+end
+
+telescope.setup({
+	defaults = {
+		file_ignore_patterns = {
+			"node_modules",
+			".git",
+			"vendor",
+			".cache",
+			"dist",
+			".nuxt",
+			".next",
+			"package%-lock%.json",
+			"yarn%.lock",
+		},
+	},
+	pickers = {
+		find_files = { hidden = true },
+		live_grep = {
+			additional_args = function()
+				return { "--hidden" }
+			end,
+		},
+	},
+})
+
+-- Keymaps for Telescope
 vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
 vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Telescope live grep" })
 vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
 vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })
-vim.keymap.set("n", "<leader>fr", builtin.oldfiles, { desc = "Telescope recent files", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>fr", builtin.oldfiles, { desc = "Telescope recent files" })
 
--- Autoclose setup
+-- Autoclose Setup
 require("autoclose").setup()
 
--- Terminal setup
-require("toggleterm").setup({
-    size = 20,                -- Size of the terminal
-    open_mapping = [[<c-t>]], -- Default keymap to open/close the terminal
-    hide_numbers = true,      -- Hide line numbers in the terminal buffer
-    shade_filetypes = {},
-    shade_terminals = true,
-    insert_mappings = true,
-    terminal_mappings = true,
-    shading_factor = 2,     -- Darken the terminal background
-    start_in_insert = true, -- Start in insert mode
-    persist_size = true,    -- Persist the terminal size
-    direction = "float",    -- Options: 'vertical', 'horizontal', 'tab', 'float'
-    close_on_exit = true,   -- Close the terminal when the process exits
-    shell = vim.o.shell,    -- Use the default shell
-    float_opts = {
-        border = "curved",  -- Border style: 'single', 'double', 'shadow', 'curved'
-    },
-})
-
--- Toggle a terminal with Ctrl-\
-vim.keymap.set("n", "<C-\\>", ":ToggleTerm<CR>", { noremap = true, silent = true })
-
--- Open a terminal in a floating window with <Leader>tf
-vim.keymap.set("n", "<Leader>ta", function()
-    require("toggleterm").toggle(1) -- First terminal instance
-end, { noremap = true, silent = true })
-
--- Open a vertical split terminal with <Leader>tv
-vim.keymap.set("n", "<Leader>tv", ":ToggleTerm direction=vertical<CR>", { noremap = true, silent = true })
-
--- Open a horizontal split terminal with <Leader>th
-vim.keymap.set("n", "<Leader>th", ":ToggleTerm direction=horizontal<CR>", { noremap = true, silent = true })
-
--- Lazily close all terminals with <Leader>tx
-vim.keymap.set("n", "<Leader>tx", ":ToggleTermToggleAll<CR>", { noremap = true, silent = true })
-
--- Use <Esc> to switch from terminal mode to normal mode
-vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { noremap = true, silent = true })
-
-vim.keymap.set("n", "<Leader>y", ":%y +<CR>", { noremap = true, silent = true })
-
--- Split keymaps
--- Vertical split with <Leader>sv
-vim.keymap.set("n", "<Leader>sv", ":vsplit<CR>", { noremap = true, silent = true })
-
--- Horizontal split with <Leader>sh
-vim.keymap.set("n", "<Leader>sh", ":split<CR>", { noremap = true, silent = true })
-
--- Quickly navigate between splits using <Leader>h, <Leader>j, <Leader>k, <Leader>l
-vim.keymap.set("n", "<Leader>h", "<C-w>h", { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader>j", "<C-w>j", { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader>k", "<C-w>k", { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader>l", "<C-w>l", { noremap = true, silent = true })
-
--- Resize splits more easily with arrow keys
-vim.keymap.set("n", "<Leader><Left>", "<C-w><", { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader><Right>", "<C-w>>", { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader><Up>", "<C-w>+", { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader><Down>", "<C-w>-", { noremap = true, silent = true })
-
--- Exit & save
-vim.keymap.set("n", "<Leader>q", ":q<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader>qa", ":qa!<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader>w", ":w<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader>wq", ":wq<CR>", { noremap = true, silent = true })
-
--- Move to the end of the line with Shift + L
-vim.keymap.set("n", "L", "$", { noremap = true, silent = true })
-
--- Move to the beginning of the line with Shift + H
-vim.keymap.set("n", "H", "^", { noremap = true, silent = true })
-
--- Conform setup
-require("conform").setup({
-    format_on_save = function(bufnr)
-        if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
-            return
-        end
-        return { timeout_ms = 500, lsp_format = "fallback" }
-    end,
-    formatters_by_ft = {
-        lua = { "stylua" },
-        -- Conform will run multiple formatters sequentially
-        python = { "isort", "black" },
-        -- You can customize some of the format options for the filetype (:help conform.format)
-        rust = { "rustfmt", lsp_format = "fallback" },
-        -- Conform will run the first available formatter
-        javascript = { "prettierd", "prettier", stop_after_first = true },
-        go = { "gofmt" },
-        php = { "phpcbf" },
-        json = { "fixjson" },
-    },
-})
-
-vim.api.nvim_create_user_command("FormatDisable", function(args)
-    if args.bang then
-        -- FormatDisable! will disable formatting just for this buffer
-        vim.b.disable_autoformat = true
-    else
-        vim.g.disable_autoformat = true
-    end
-end, {
-    desc = "Disable autoformat-on-save",
-    bang = true,
-})
-vim.api.nvim_create_user_command("FormatEnable", function()
-    vim.b.disable_autoformat = false
-    vim.g.disable_autoformat = false
-end, {
-    desc = "Re-enable autoformat-on-save",
-})
-
--- Treesitter
-require("nvim-treesitter.configs").setup({
-    ensure_installed = {
-        "c",
-        "lua",
-        "vim",
-        "vimdoc",
-        "query",
-        "markdown",
-        "markdown_inline",
-        "vue",
-        "php",
-        "go",
-        "rust",
-        "javascript",
-    },
-    sync_install = false,
-    ignore_install = {},
-    highlight = {
-        enable = true,
-        additional_vim_regex_highlighting = false,
-    },
-})
+-- Split Navigation and Resize
+vim.keymap.set("n", "<Leader>sv", ":vsplit<CR>")
+vim.keymap.set("n", "<Leader>sh", ":split<CR>")
+vim.keymap.set("n", "<Leader>h", "<C-w>h")
+vim.keymap.set("n", "<Leader>j", "<C-w>j")
+vim.keymap.set("n", "<Leader>k", "<C-w>k")
+vim.keymap.set("n", "<Leader>l", "<C-w>l")
+vim.keymap.set("n", "<Leader><Left>", "<C-w><")
+vim.keymap.set("n", "<Leader><Right>", "<C-w>>")
+vim.keymap.set("n", "<Leader><Up>", "<C-w>+")
+vim.keymap.set("n", "<Leader><Down>", "<C-w>-")
