@@ -52,14 +52,15 @@ Plug("numToStr/Comment.nvim")
 Plug("lewis6991/gitsigns.nvim")
 Plug("echasnovski/mini.nvim")
 Plug("Iron-E/nvim-highlite")
-Plug("alexanderbluhm/black.nvim")
 Plug("xiyaowong/transparent.nvim")
+Plug("rose-pine/neovim")
 
 vim.call("plug#end")
 
 -- Colorscheme & Transparency
 vim.o.background = "dark"
-vim.cmd.colorscheme("black")
+require("rose-pine").setup()
+vim.cmd.colorscheme("rose-pine")
 require("transparent").setup()
 vim.api.nvim_create_autocmd("VimEnter", {
 	callback = function()
