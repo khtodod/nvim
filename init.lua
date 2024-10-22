@@ -25,6 +25,7 @@ vim.opt.signcolumn = "yes"
 vim.opt.updatetime = 50
 vim.opt.colorcolumn = "80"
 vim.opt.mouse = "a"
+vim.keymap.set("i", "jj", "<Esc>")
 
 vim.cmd([[set isfname+=@-@]])
 -- Unbind arrow keys in all modes
