@@ -54,14 +54,15 @@ Plug("lewis6991/gitsigns.nvim")
 Plug("echasnovski/mini.nvim")
 Plug("Iron-E/nvim-highlite")
 Plug("xiyaowong/transparent.nvim")
-Plug("rose-pine/neovim")
+Plug("behemothbucket/gruber-darker-theme.nvim")
 
 vim.call("plug#end")
 
 -- Colorscheme & Transparency
 vim.o.background = "dark"
-require("rose-pine").setup()
-vim.cmd.colorscheme("rose-pine")
+require("gruber-darker").setup()
+vim.cmd("colorscheme gruber-darker")
+
 require("transparent").setup()
 vim.api.nvim_create_autocmd("VimEnter", {
 	callback = function()
