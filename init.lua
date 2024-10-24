@@ -54,14 +54,17 @@ Plug("lewis6991/gitsigns.nvim")
 Plug("echasnovski/mini.nvim")
 Plug("Iron-E/nvim-highlite")
 Plug("xiyaowong/transparent.nvim")
-Plug("behemothbucket/gruber-darker-theme.nvim")
+Plug("Mofiqul/adwaita.nvim")
 
 vim.call("plug#end")
 
 -- Colorscheme & Transparency
 vim.o.background = "dark"
-require("gruber-darker").setup()
-vim.cmd("colorscheme gruber-darker")
+vim.g.adwaita_darker = true -- for darker version
+vim.g.adwaita_disable_cursorline = true -- to disable cursorline
+vim.g.adwaita_transparent = true -- makes the background transparent
+
+vim.cmd("colorscheme adwaita")
 
 require("transparent").setup()
 vim.api.nvim_create_autocmd("VimEnter", {
