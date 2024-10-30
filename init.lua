@@ -4,30 +4,31 @@ if not vim.fn.has("nvim") then
 end
 
 -- Set <leader> key and general options
-local vim = vim
 vim.g.mapleader = " "
 
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.expandtab = true
-vim.opt.shiftwidth = 4
-vim.opt.tabstop = 4
-vim.opt.smartindent = true
-vim.opt.wrap = false
-vim.opt.swapfile = false
-vim.opt.backup = false
-vim.opt.undofile = true
-vim.opt.hlsearch = false
-vim.opt.incsearch = true
-vim.opt.termguicolors = true
-vim.opt.scrolloff = 8
-vim.opt.signcolumn = "yes"
-vim.opt.updatetime = 50
-vim.opt.colorcolumn = "80"
-vim.opt.mouse = "a"
-vim.keymap.set("i", "jj", "<Esc>")
+local opt = vim.opt
+opt.number = true
+opt.relativenumber = true
+opt.expandtab = true
+opt.shiftwidth = 4
+opt.tabstop = 4
+opt.smartindent = true
+opt.wrap = false
+opt.swapfile = false
+opt.backup = false
+opt.undofile = true
+opt.hlsearch = false
+opt.incsearch = true
+opt.termguicolors = true
+opt.scrolloff = 10
+opt.signcolumn = "yes"
+opt.updatetime = 50
+opt.colorcolumn = "80"
+opt.mouse = "a"
+opt.showmode = false -- Disable default mode text since we're using a statusline
 
-vim.cmd([[set isfname+=@-@]])
+vim.cmd([[set isfname+=@-@]]) -- Allow @ character in filenames
+
 -- Unbind arrow keys in all modes
 for _, key in ipairs({ "<Up>", "<Down>", "<Left>", "<Right>" }) do
 	vim.keymap.set("", key, "<NOP>", { noremap = true, silent = true })
@@ -60,20 +61,44 @@ vim.call("plug#end")
 
 -- Colorscheme & Transparency
 vim.o.background = "dark"
-
 vim.cmd("colorscheme hybrid")
+require("transparent").setup({ enable = true })
 
-require("transparent").setup()
-vim.api.nvim_create_autocmd("VimEnter", {
-	callback = function()
-		vim.cmd("TransparentEnable")
-	end,
-})
+-- Keymaps Configuration
+local function set_keymaps()
+	local keymap = vim.keymap.set
+	-- General Keymaps
+	keymap("i", "jj", "<Esc>")
+	keymap("n", "<leader>sv", ":vsplit<CR>")
+	keymap("n", "<leader>sh", ":split<CR>")
+	keymap("n", "<leader>h", "<C-w>h")
+	keymap("n", "<leader>j", "<C-w>j")
+	keymap("n", "<leader>k", "<C-w>k")
+	keymap("n", "<leader>l", "<C-w>l")
+	keymap("n", "<leader><Left>", "<C-w><")
+	keymap("n", "<leader><Right>", "<C-w>>")
+	keymap("n", "<leader><Up>", "<C-w>+")
+	keymap("n", "<leader><Down>", "<C-w>-")
+
+	-- Telescope Keymaps
+	local builtin = require("telescope.builtin")
+	keymap("n", "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
+	keymap("n", "<leader>fg", builtin.live_grep, { desc = "Telescope live grep" })
+	keymap("n", "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
+	keymap("n", "<leader>fr", builtin.oldfiles, { desc = "Telescope recent files" })
+
+	-- ToggleTerm Keymap
+	keymap("n", "<C-\\>", ":ToggleTerm<CR>", { noremap = true, silent = true })
+	keymap("t", "<C-\\>", [[<C-\><C-n>:ToggleTerm<CR>]], { noremap = true, silent = true })
+end
+set_keymaps()
 
 -- Mason & LSP Configuration
+local mason_lspconfig = require("mason-lspconfig")
 local lspconfig = require("lspconfig")
+
 require("mason").setup()
-require("mason-lspconfig").setup({
+mason_lspconfig.setup({
 	ensure_installed = {
 		"lua_ls",
 		"rust_analyzer",
@@ -89,32 +114,33 @@ require("mason-lspconfig").setup({
 		"jsonls",
 	},
 })
-require("mason-lspconfig").setup_handlers({
-	function(server)
-		lspconfig[server].setup({})
+mason_lspconfig.setup_handlers({
+	function(server_name)
+		lspconfig[server_name].setup({})
 	end,
 })
 
 -- Treesitter Configuration
-require("nvim-treesitter.configs").setup({
-	ensure_installed = {
-		"c",
-		"lua",
-		"vim",
-		"vimdoc",
-		"query",
-		"markdown",
-		"markdown_inline",
-		"vue",
-		"php",
-		"go",
-		"rust",
-		"javascript",
-	},
-	highlight = { enable = true, additional_vim_regex_highlighting = false },
-})
+vim.defer_fn(function()
+	require("nvim-treesitter.configs").setup({
+		ensure_installed = {
+			"lua",
+			"vim",
+			"markdown",
+			"vue",
+			"php",
+			"go",
+			"rust",
+			"javascript",
+			"c",
+			"query",
+			"markdown_inline",
+		},
+		highlight = { enable = true, additional_vim_regex_highlighting = false },
+	})
+end, 0)
 
--- Conform (Formatting)
+-- Conform (Auto-formatting)
 require("conform").setup({
 	format_on_save = function(bufnr)
 		if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
@@ -125,8 +151,8 @@ require("conform").setup({
 	formatters_by_ft = {
 		lua = { "stylua" },
 		python = { "isort", "black" },
-		rust = { "rustfmt", lsp_format = "fallback" },
-		javascript = { "prettierd", "prettier", stop_after_first = true },
+		rust = { "rustfmt" },
+		javascript = { "prettierd" },
 		go = { "gofmt" },
 		php = { "phpcbf" },
 		json = { "fixjson" },
@@ -141,9 +167,6 @@ vim.api.nvim_create_user_command("FormatEnable", function()
 	vim.b.disable_autoformat, vim.g.disable_autoformat = false, false
 end, { desc = "Enable autoformat-on-save" })
 
--- Neoscroll Setup
-require("neoscroll").setup({ easing_function = "quadratic" })
-
 -- Gitsigns Setup
 require("gitsigns").setup({
 	signs = {
@@ -155,75 +178,25 @@ require("gitsigns").setup({
 		untracked = { text = "┆" },
 	},
 	current_line_blame = true,
-	current_line_blame_opts = {
-		virt_text = true,
-		virt_text_pos = "eol",
-		delay = 1000,
-	},
+	current_line_blame_opts = { virt_text = true, virt_text_pos = "eol", delay = 1000 },
 	watch_gitdir = { follow_files = true },
 })
 
--- Comment Plugin
+-- Comment Plugin Setup
 require("Comment").setup()
 
--- Mini Statusline
+-- Mini Statusline Setup
 require("mini.statusline").setup({ use_icons = false })
 
--- Telescope Configuration
-local status_ok, telescope = pcall(require, "telescope")
-if not status_ok then
-	vim.notify("Telescope not found!", vim.log.levels.ERROR)
-	return
-end
-
-local builtin_status_ok, builtin = pcall(require, "telescope.builtin")
-if not builtin_status_ok then
-	vim.notify("Telescope built-in functions not available", vim.log.levels.ERROR)
-	return
-end
-
-telescope.setup({
-	defaults = {
-		file_ignore_patterns = {
-			"node_modules",
-			".git",
-			"vendor",
-			".cache",
-			"dist",
-			".nuxt",
-			".next",
-			"package%-lock%.json",
-			"yarn%.lock",
-		},
-	},
-	pickers = {
-		find_files = { hidden = true },
-		live_grep = {
-			additional_args = function()
-				return { "--hidden" }
-			end,
-		},
-	},
-})
-
--- Keymaps for Telescope
-vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
-vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Telescope live grep" })
-vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
-vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })
-vim.keymap.set("n", "<leader>fr", builtin.oldfiles, { desc = "Telescope recent files" })
+-- Neoscroll Setup
+vim.defer_fn(function()
+	require("neoscroll").setup({ easing_function = "quadratic" })
+end, 0)
 
 -- Autoclose Setup
-require("autoclose").setup()
+vim.defer_fn(function()
+	require("autoclose").setup()
+end, 0)
 
--- Split Navigation and Resize
-vim.keymap.set("n", "<Leader>sv", ":vsplit<CR>")
-vim.keymap.set("n", "<Leader>sh", ":split<CR>")
-vim.keymap.set("n", "<Leader>h", "<C-w>h")
-vim.keymap.set("n", "<Leader>j", "<C-w>j")
-vim.keymap.set("n", "<Leader>k", "<C-w>k")
-vim.keymap.set("n", "<Leader>l", "<C-w>l")
-vim.keymap.set("n", "<Leader><Left>", "<C-w><")
-vim.keymap.set("n", "<Leader><Right>", "<C-w>>")
-vim.keymap.set("n", "<Leader><Up>", "<C-w>+")
-vim.keymap.set("n", "<Leader><Down>", "<C-w>-")
+-- ToggleTerm Setup
+require("toggleterm").setup({})
