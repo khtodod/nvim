@@ -5,6 +5,8 @@ end
 
 -- Set <leader> key and general options
 vim.g.mapleader = " "
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
 local opt = vim.opt
 opt.number = true
@@ -56,6 +58,7 @@ Plug("echasnovski/mini.nvim")
 Plug("Iron-E/nvim-highlite")
 Plug("xiyaowong/transparent.nvim")
 Plug("HoNamDuong/hybrid.nvim")
+Plug("nvim-tree/nvim-tree.lua")
 
 vim.call("plug#end")
 
@@ -90,6 +93,9 @@ local function set_keymaps()
 	-- ToggleTerm Keymap
 	keymap("n", "<C-\\>", ":ToggleTerm<CR>", { noremap = true, silent = true })
 	keymap("t", "<C-\\>", [[<C-\><C-n>:ToggleTerm<CR>]], { noremap = true, silent = true })
+
+	-- Toggle NvimTree
+	keymap("n", "<Leader>n", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
 end
 set_keymaps()
 
@@ -200,3 +206,25 @@ end, 0)
 
 -- ToggleTerm Setup
 require("toggleterm").setup({})
+
+-- NvimTree
+require("nvim-tree").setup({
+	sort = {
+		sorter = "case_sensitive",
+	},
+	view = {
+		width = 30,
+	},
+	renderer = {
+		icons = {
+			show = {
+				file = false,
+				folder = false,
+				git = false,
+			},
+		},
+	},
+	filters = {
+		dotfiles = true,
+	},
+})
