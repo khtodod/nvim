@@ -82,6 +82,10 @@ local function set_keymaps()
 	keymap("n", "<leader><Right>", "<C-w>>")
 	keymap("n", "<leader><Up>", "<C-w>+")
 	keymap("n", "<leader><Down>", "<C-w>-")
+	keymap("n", "<C-h>", "^", { noremap = true, silent = true })
+	keymap("n", "<C-l>", "g_", { noremap = true, silent = true })
+	keymap("v", "<C-h>", "^", { noremap = true, silent = true })
+	keymap("v", "<C-l>", "g_", { noremap = true, silent = true })
 
 	-- Telescope Keymaps
 	local builtin = require("telescope.builtin")
